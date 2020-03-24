@@ -1,0 +1,40 @@
+# Logs
+/frontend/logs
+/frontend/*.log
+/frontend/npm-debug.log*
+/socket-io-server/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
+
+# builds
+/frontend/build/
+
+# Dependency directories
+/frontend/node_modules/
+/socket-io-server/node_modules/
+/socket-io-server/package-lock.json
+
+# Optional npm cache directory
+/frontend/.npm
+/socket-io-server/.npm
+
+# Output of 'npm pack'
+/frontend/*.tgz
+/socket-io-server/*.tgz
+
+# Yarn
+/frontend/.yarn-integrity
+/frontend/yarn.lock
+
+# dotenv environment variables file
+/frontend/.env
+/socket-io-server/.env
+
+/socket-io-server/.env.local
+/socket-io-server/.env.development.local
+/socket-io-server/.env.test.local
+/socket-io-server/.env.production.local
+
+# misc
+/frontend/.DS_Store
+/socket-io-server/conf.js
