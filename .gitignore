@@ -11,6 +11,7 @@
 
 # Dependency directories
 /frontend/node_modules/
+/frontend/package-lock.json
 /socket-io-server/node_modules/
 /socket-io-server/package-lock.json
 
