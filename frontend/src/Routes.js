@@ -1,4 +1,4 @@
-import Home from "./Components/Home";
+import Home from "./Components/Home/Home";
 import Game from "./Components/Game";
 
 const routes = [

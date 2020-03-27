@@ -93,6 +93,30 @@ state = Count(Players);
 # Tasks list
 ...
 
+# Style sheet 
+
+## Palette
+
+### First version
+
+- DARK JUNGLE GREEN #1A1E27 (BLACK)
+- LIGHT SEA GREEN #1DD3BO (GREEN)
+- AWESOME #FF206E (RED)
+- BABY POWDER #FDFFFC (WHITE)
+- VIVID CERULEAN #00A6FB (BLUE)
+
+### Second version
+
+- RICH BLACK #000C26
+- MUSTARD #FFC857
+- RED SALSA #F03A47
+- DARK IMPERIAL BLUE #08415C
+- LIGHT CYAN #D7F9FF
+
+
+
+
+
 
 
 

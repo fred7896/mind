@@ -1,0 +1,39 @@
+@import "../../variables.scss";
+
+input {
+    font-size:24px;
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: bold;
+}
+
+.mindBox {
+    width: 100%;
+    height: 40vh;
+}
+
+.nameInput {
+	height: 53px;
+	width: 100%;
+}
+
+.inputBox {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.imperialButton {
+    background-color: $imperialBlue;
+    font-size: 24px;
+    font-weight: bold;
+    
+}
+
+.salsaButton {
+    background-color: $redSalsa;
+    font-size: 24px;
+    font-weight: bold;
+    
+}

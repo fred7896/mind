@@ -1,0 +1,17 @@
+@import "./variables.scss";
+body {
+    background-color: $richBlack; 
+    margin: 0;
+    padding: 0;
+}
+
+.fontCyan {
+    color : $lightCyan;
+}
+
+
+.cyanAndTransparent {
+    background-color: $richBlack;
+    color: $lightCyan;
+    border : 1px solid $lightCyan;
+}
