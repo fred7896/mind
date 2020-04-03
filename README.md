@@ -69,26 +69,52 @@ state = Count(Players);
 
 ## Tables
 
-## account
-- id
-- login/name
-~~->password~~
+## user
+- id_user (PK)
+- user_name
 
 ## game
-- playerId
-- status (before / run / ended )
-- lives
-- turn
-- shuriken
-- begin datetime
+- id_game (PK)
+- shared_code
+- game_status (before / run / ended )
+- start datetime
 - end datetime
-- gameResult (Lose/win)
-- boardState string
+- game_result (Lose/win)
+- lives
+- shuriken
+- turn
+- move
+- created_by (FK/id_user)
+- created_at datetime
 
-## Hands
-- gameId
-- playeriD
-- hand(list of numbers in string)
+## game_user 
+- id game_user (PK)
+- id game (FK)
+- id_user (FK)
+
+## card
+- id_card (PK)
+- card_value
+
+## hand_content
+- id_hand_content
+- id_game_user
+- id_move
+
+## move
+- id_move
+- id_card
+- id_game
+- origin_slot_id
+- final_slot_id
+- turn ?
+
+## slot
+- id_slot
+- name_slot  library, hand, inGame, graveyard
+- value_slot (default value : 0) possible value [library(0), hand(1), inGame(2), graveyard(3)]
+
+
 
 # Tasks list
 ...
