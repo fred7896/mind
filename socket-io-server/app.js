@@ -200,4 +200,84 @@ app.get("/api/game/all/:id", (req, res) => {
 	});
 });
 
+// GET CARDS ALL
+app.get("/api/card/all", (req, res) => {
+	db.query("SELECT * FROM card ", (err, results) => {
+		if (err) {
+			res.status(500).send("Erreur lors de la récupération de la partie");
+		} else {
+			res.json(results);
+		}
+	});
+});
+
+// SET CARDGAME
+app.post("/api/cardgame", (req, res) => {
+	const cardgame = {
+		id_card: req.body.id_card,
+		id_game: req.body.id_game
+	};
+	db.query("INSERT INTO card_game SET ?", cardgame, (err, results) => {
+		if (err) {
+			console.error("Failure! " + err);
+			return res.status(500).send("requete de création invalide");
+		} else {
+			console.log("The solution is: ", results);
+			res.send({
+				code: 201,
+				success: "Succès - création library"
+			});
+		}
+	});
+});
+
+// GET CARDGAME BY GAME
+app.get("/api/cardgame/game/:id", (req, res) => {
+	const gameId = req.params.id;
+	db.query("SELECT * FROM card_game WHERE id_game = ?", [gameId], (err, results) => {
+		if (err) {
+			res.status(500).send("get cardgame error");
+		} else {
+			res.json(results);
+		}
+	});
+});
+
+// GETCARDSTATE BY GAME
+app.get("/api/cardstate/game/:id", (req, res) => {
+	const gameId = req.params.id;
+	db.query(
+		"SELECT * FROM card_state AS cs JOIN card_game AS cg ON cg.id_card_game = cs.id_card_game WHERE cg.id_game = ?",
+		[gameId],
+		(err, results) => {
+			if (err) {
+				res.status(500).send("get cardstate error");
+			} else {
+				res.json(results);
+			}
+		}
+	);
+});
+
+// SET CARDSTATE
+app.post("/api/cardstate", (req, res) => {
+	const cardstate = {
+		id_card_game: req.body.id_card_game,
+		id_slot: req.body.id_slot,
+		move: req.body.move
+	};
+	db.query("INSERT INTO card_state SET ?", cardstate, (err, results) => {
+		if (err) {
+			console.error("Failure! " + err);
+			return res.status(500).send("requete de création invalide");
+		} else {
+			console.log("The solution is: ", results);
+			res.send({
+				code: 201,
+				success: "Succès - création library"
+			});
+		}
+	});
+});
+
 server.listen(port, () => console.log(`Listening on port ${port}`));

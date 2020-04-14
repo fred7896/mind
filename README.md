@@ -96,18 +96,18 @@ state = Count(Players);
 - id_card (PK)
 - card_value
 
-## hand_content
-- id_hand_content
-- id_game_user
-- id_move
-
-## move
-- id_move
+## card_game
+- id_card_game
 - id_card
 - id_game
-- origin_slot_id
-- final_slot_id
-- turn ?
+
+## card_state
+- id_card_state
+- id_card_game
+- id_slot
+- id_game_user
+- move ?
+
 
 ## slot
 - id_slot
@@ -115,9 +115,53 @@ state = Count(Players);
 - value_slot (default value : 0) possible value [library(0), hand(1), inGame(2), graveyard(3)]
 
 
-
 # Tasks list
+id-user 31 & id-user 32
 ...
+
+Step 1 - build library (done)
+
+// draft
+
+Step 2 - draw cards
+
+select id_card ou cardstate (random)
+
+let data {
+    slot : 2
+    user : 31
+    move : +1
+}
+put id(random), data
+
+1 - 1 - 20 - 2 - 31 - 1
+2 - 2 - 20 - 2 - 32 - 1
+
+how to get library
+select id_card_state from cards-state join card_game where gameid = 20 && slot_id = 1  
+
+Step 3 - action player 31
+
+select * from cards-state where user_id = 31 && slot_id = 2 && gameid = 20 
+
+put
+1 - 1 - 20 - 3 - 31 - 2
+
+Step 4 - action player 32
+
+put
+2 - 2 - 20 - 3 - 32 - 3
+
+check hand 
+
+select * from cards-state where slot_id = 1 && gameid = 20
+
+resultats []
+
+Step 5 - change turn
+
+select * from cards-state where gameid = 20 && slot_id = 1
+
 
 # Style sheet 
 

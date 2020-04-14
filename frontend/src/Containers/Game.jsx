@@ -11,13 +11,17 @@ export default class Game extends React.Component {
 		shuriken: 1,
 		turn: 1,
 		gameInfos: [],
-		move: 0
+		move: 0,
+		cardgame: [],
+		cardstate : []
 	};
 
 	componentDidMount() {
 		this.getGameInfos();
 		if (this.state.move === 0) {
 			this.initLife();
+			this.setCardGame();
+			this.setCardState();
 		}
 	}
 
@@ -45,7 +49,6 @@ export default class Game extends React.Component {
 			.get(`http://localhost:4001/api/usergame/game/${this.props.match.params.gameId}`)
 			.then(res => {
 				if (res.data.length > 0) {
-					console.log(res.data);
 					let data = {
 						life: res.data.length
 					};
@@ -55,7 +58,6 @@ export default class Game extends React.Component {
 							data
 						)
 						.then(res => {
-							console.log(res);
 							this.getGameInfos();
 						});
 				}
@@ -66,9 +68,87 @@ export default class Game extends React.Component {
 
 		console.log("init game ...");
 	};
+
+	setCardGame = () => {
+		axios
+			.get(`http://localhost:4001/api/cardgame/game/${this.props.match.params.gameId}`)
+			.then(res => {
+				if (res.data.length === 0) {
+					axios.get(`http://localhost:4001/api/card/all`).then(res => {
+						if (res.data.length > 0) {
+							console.log(res.data);
+							for (let i = 0; i < res.data.length; i++) {
+								axios
+									.post(
+										"http://localhost:4001/api/cardgame",
+										{
+											id_card: res.data[i].idcard,
+											id_game: this.props.match.params.gameId
+										},
+										{
+											headers: {
+												Accept: "application/json"
+											}
+										}
+									)
+									.then(res => {
+										this.setState({
+											move: this.state.move + 1
+										});
+										console.log("create library...");
+										axios
+											.get(
+												`http://localhost:4001/api/cardgame/game/${this.props.match.params.gameId}`
+											)
+											.then(res => {
+												console.log(res.data);
+												this.setState({ cardgame: res.data });
+											});
+									});
+							}
+						}
+					});
+				} else {
+					this.setState({ cardgame: res.data });
+				}
+			});
+	};
+
+	setCardState = () => {
+		axios
+			.get(`http://localhost:4001/api/cardstate/game/${this.props.match.params.gameId}`)
+			.then(res => {
+				console.log(res.data);
+				if (res.data.length === 0) {
+					for (let i = 0; i < this.state.cardgame.length; i++) {
+						axios
+							.post(
+								"http://localhost:4001/api/cardstate",
+								{
+									id_card_game: this.state.cardgame[i].id_card_game,
+									id_slot: 1,
+									move: this.state.move + 1
+								},
+								{
+									headers: {
+										Accept: "application/json"
+									}
+								}
+							)
+							.then(res => console.log(res));
+					}
+				} else {
+					this.setState({
+						cardstate: res.data
+					});
+				}
+			});
+	};
+
 	render() {
 		console.log(this.state.gameInfos);
-		console.log(this.state.life);
+		console.log(this.state.cardgame);
+		console.log(this.state.cardstate);
 		return (
 			<div className="container fontCyan boldLife">
 				<div className="d-flex my-3">
