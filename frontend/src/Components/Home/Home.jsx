@@ -162,33 +162,32 @@ export default class Home extends React.Component {
 	checkGame = () => {
 		console.log(this.state.joinedGame);
 		axios
-			.get(
-				`http://localhost:4001/api/usergame/game/${this.state.joinedGame[0].id_game}`
-			)
+			.get(`http://localhost:4001/api/usergame/game/${this.state.joinedGame[0].id_game}`)
 			.then(res => {
 				console.log(res.data);
-				if(res.data.length === 0) {
+				if (res.data.length === 0) {
 					axios
-			.post(
-				"http://localhost:4001/api/usergame",
-				{
-					id_game_fk: this.state.joinedGame[0].id_game,
-					id_user: this.state.userId,
-
-				},
-				{
-					headers: {
-						Accept: "application/json"
-					}
-				}
-			)
-			.then(response => {
-				console.log(this.props.history);
-				this.props.history.push(`/game/lobby/${this.state.joinedGame[0].id_game}`);
-			})
-			.catch(error => {
-				Swal.fire("Erreur", "Fail join game", "error");
-			});
+						.post(
+							"http://localhost:4001/api/usergame",
+							{
+								id_game_fk: this.state.joinedGame[0].id_game,
+								id_user: this.state.userId
+							},
+							{
+								headers: {
+									Accept: "application/json"
+								}
+							}
+						)
+						.then(response => {
+							console.log(this.props.history);
+							this.props.history.push(
+								`/game/lobby/${this.state.joinedGame[0].id_game}`
+							);
+						})
+						.catch(error => {
+							Swal.fire("Erreur", "Fail join game", "error");
+						});
 				}
 			})
 			.catch(error => {
@@ -255,9 +254,7 @@ export default class Home extends React.Component {
 								className="link-unstyled"
 								style={{ width: "100%" }}
 							>
-								<div
-									className="nameInput inputBox imperialButton my-2"
-								>
+								<div className="nameInput inputBox imperialButton my-2">
 									CURRENT GAMES
 								</div>
 							</Link>

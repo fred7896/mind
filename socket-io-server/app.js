@@ -174,7 +174,7 @@ app.get("/api/game/creator/:id", (req, res) => {
 });
 
 // UPDATE STATUS GAME
-app.put("/api/game/status/:id", (req, res) => {
+app.put("/api/game/:id", (req, res) => {
 	const gameId = req.params.id;
 	const formData = req.body;
 
@@ -184,6 +184,18 @@ app.put("/api/game/status/:id", (req, res) => {
 			res.status(500).send("Erreur lors de la modification d'une game");
 		} else {
 			res.sendStatus(200);
+		}
+	});
+});
+
+// GET GAME INFOS BY GAME ID
+app.get("/api/game/all/:id", (req, res) => {
+	const gameId = req.params.id;
+	db.query("SELECT * FROM game WHERE id_game = ?", [gameId], (err, results) => {
+		if (err) {
+			res.status(500).send("Erreur lors de la récupération de la partie");
+		} else {
+			res.json(results);
 		}
 	});
 });

@@ -25,7 +25,7 @@ export default class WarmUp extends React.Component {
 			game_status: 1
 		};
 		axios
-			.put(`http://localhost:4001/api/game/status/${this.props.match.params.gameId}`, data)
+			.put(`http://localhost:4001/api/game/${this.props.match.params.gameId}`, data)
 			.then(res => {
 				console.log(res);
 				this.props.history.push(`/game/main/${this.props.match.params.gameId}`);
