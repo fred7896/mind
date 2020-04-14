@@ -19,7 +19,7 @@ export default class GamesCreated extends React.Component {
 			case 0:
 				return (
 					<Link
-						to={`/game/step1/${id}`}
+						to={`/game/lobby/${id}`}
 						className="link-unstyled"
 						style={{ width: "50%" }}
 						onClick={this.joinGame.bind(this, id)}
@@ -35,7 +35,7 @@ export default class GamesCreated extends React.Component {
 			case 1:
 				return (
 					<Link
-						to={`/game/step1/${id}`}
+						to={`/game/lobby/${id}`}
 						className="link-unstyled"
 						style={{ width: "50%" }}
 						onClick={this.joinGame.bind(this, id)}

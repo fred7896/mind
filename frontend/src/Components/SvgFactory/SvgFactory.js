@@ -1,9 +1,13 @@
 import React from "react";
 import NotFoundSvg from "../SvgFactory/NotFoundSvg";
 import MindLogo from "../SvgFactory/MindLogo";
+import Shuriken from "../SvgFactory/Shuriken";
+import Life from "../SvgFactory/Life";
 
 const components = {
-	mind: MindLogo
+	mind: MindLogo,
+	shuriken: Shuriken,
+	life: Life
 };
 
 export default class SvgFactory extends React.Component {

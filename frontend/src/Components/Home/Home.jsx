@@ -184,7 +184,7 @@ export default class Home extends React.Component {
 			)
 			.then(response => {
 				console.log(this.props.history);
-				this.props.history.push(`/game/step1/${this.state.joinedGame[0].id_game}`);
+				this.props.history.push(`/game/lobby/${this.state.joinedGame[0].id_game}`);
 			})
 			.catch(error => {
 				Swal.fire("Erreur", "Fail join game", "error");
@@ -257,7 +257,6 @@ export default class Home extends React.Component {
 							>
 								<div
 									className="nameInput inputBox imperialButton my-2"
-									//onClick={this.displayGamesCreatedByUser}
 								>
 									CURRENT GAMES
 								</div>
