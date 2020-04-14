@@ -1,5 +1,6 @@
 import Home from "./Components/Home/Home";
-import Game from "./Components/Game";
+import WarmUp from "./Containers/WarmUp";
+import GamesCreated from "./Containers/GamesCreated";
 
 const routes = [
 	{
@@ -8,12 +9,12 @@ const routes = [
 		component: Home
 	},
 	{
-		path: "/game",
-		component: Game
+		path: "/game/step1/:gameId",
+		component: WarmUp
 	},
 	{
-		path: "/game/:id",
-		component: Game
+		path: "/games/user/:id",
+		component: GamesCreated
 	}
 ];
 
