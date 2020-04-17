@@ -1,13 +1,19 @@
 import React from "react";
-import NotFoundSvg from "../SvgFactory/NotFoundSvg";
-import MindLogo from "../SvgFactory/MindLogo";
-import Shuriken from "../SvgFactory/Shuriken";
-import Life from "../SvgFactory/Life";
+import NotFoundSvg from "./NotFoundSvg";
+import MindLogo from "./MindLogo";
+import Shuriken from "./Shuriken";
+import Life from "./Life";
+import Deck from "./Deck";
+import Circle from "./Circle";
+import Card from "./Card";
 
 const components = {
 	mind: MindLogo,
 	shuriken: Shuriken,
-	life: Life
+	life: Life,
+	deck: Deck,
+	circle: Circle,
+	card: Card
 };
 
 export default class SvgFactory extends React.Component {

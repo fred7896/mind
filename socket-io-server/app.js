@@ -49,6 +49,19 @@ app.get("/", (req, res) => {
 	res.status(200).send(msg);
 });
 
+// GET USER
+
+app.get("/api/user", (req, res) => {
+	let user = req.query.name;
+	db.query(`SELECT id_user FROM user WHERE user_name = ?`, [user], (err, results) => {
+		if (err) {
+			res.status(500).send("Erreur lors de la récupération du user");
+		} else {
+			res.json(results);
+		}
+	});
+});
+
 // CREATE USER
 
 app.post("/api/user", (req, res) => {
@@ -69,19 +82,6 @@ app.post("/api/user", (req, res) => {
 				code: 201,
 				success: "Succès - création user"
 			});
-		}
-	});
-});
-
-// GET USER
-
-app.get("/api/user", (req, res) => {
-	let user = req.query.name;
-	db.query(`SELECT id_user FROM user WHERE user_name = ?`, [user], (err, results) => {
-		if (err) {
-			res.status(500).send("Erreur lors de la récupération du user");
-		} else {
-			res.json(results);
 		}
 	});
 });
@@ -278,6 +278,37 @@ app.post("/api/cardstate", (req, res) => {
 			});
 		}
 	});
+});
+
+//UPDATE CARDSTATE
+app.put("/api/cardstate/:id", (req, res) => {
+	const cardstateId = req.params.id;
+	const formData = req.body;
+
+	db.query("UPDATE card_state SET ? WHERE id_card_state = ?", [formData, cardstateId], err => {
+		if (err) {
+			console.log(err);
+			res.status(500).send("Erreur lors de la modification d'une game");
+		} else {
+			res.sendStatus(200);
+		}
+	});
+});
+
+//GET CARD VALUE
+app.get("/api/cardgame/value/:id", (req, res) => {
+	const id_card_game = req.params.id;
+	db.query(
+		"SELECT id_card FROM card_game WHERE id_card_game = ?",
+		[id_card_game],
+		(err, results) => {
+			if (err) {
+				res.status(500).send("get card value error");
+			} else {
+				res.json(results);
+			}
+		}
+	);
 });
 
 server.listen(port, () => console.log(`Listening on port ${port}`));

@@ -1,13 +1,73 @@
 @import "../variables.scss";
 
+.game {
+    line-height: 1;
+}
+
 .mustard {
-    color : $mustard;
+	color: $mustard;
 }
 
 .salsa {
-    color : $redSalsa;
+	color: $redSalsa;
 }
 
 .boldLife {
-    font-weight: bold;
+	font-weight: bold;
+}
+
+.container-deck {
+	width: 120px;
+	position: relative;
+	text-align: center;
+	font-size: 2em;
+}
+
+.count-deck {
+	position: absolute;
+	top: 50%;
+	left: 62%;
+	transform: translate(-50%, -50%);
+}
+
+.container-circle {
+	width: 100%;
+	position: relative;
+	text-align: center;
+
+}
+
+.count-last {
+	font-size: 2em;
+}
+
+.count-main {
+    font-size: 4em;
+}
+
+.numero {
+    position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%); 
+}
+
+.mainCircle {
+	height: 160px;
+	width: 160px;
+	border: 1px solid $lightCyan;
+	border-radius: 50%;
+	display: inline-block;
+}
+.auxCircle {
+	height: 40px;
+	width: 40px;
+	border: 1px solid $lightCyan;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+.container-card {
+    position: relative;
+	text-align: center;
 }
