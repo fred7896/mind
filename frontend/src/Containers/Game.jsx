@@ -4,6 +4,8 @@ import "../Components/Home/Home.scss";
 import "../global.scss";
 import "./Game.scss";
 import SvgFactory from "../Components/SvgFactory/SvgFactory";
+import Card from "../Components/Card";
+import DustBin from "../Components/DustBin";
 
 export default class Game extends React.Component {
 	state = {
@@ -18,9 +20,9 @@ export default class Game extends React.Component {
 		players: [],
 		userId: "",
 		myDeck: [],
-		allPlayersCountCards : [],
-		othersPlayersCountCards : []
-
+		allPlayersCountCards: [],
+		othersPlayersCountCards: [],
+		dustBin: []
 	};
 
 	componentDidMount() {
@@ -285,26 +287,37 @@ export default class Game extends React.Component {
 
 		const allPlayersCountCards = this.state.players.map(player => {
 			console.log(player);
-			let countTab = result.filter(count =>  { return player.id_user_game == count.id_user_game });
+			let countTab = result.filter(count => {
+				return player.id_user_game == count.id_user_game;
+			});
 			console.log(countTab);
-			return {id_user_game : player.id_user_game , user_name : player.user_name, countCard : countTab[0].countCard }
+			return {
+				id_user_game: player.id_user_game,
+				user_name: player.user_name,
+				countCard: countTab[0].countCard
+			};
 		});
 
 		const othersPlayersCountCards = othersPlayers.map(player => {
 			console.log(player);
-			let countTab = result.filter(count =>  { return player.id_user_game == count.id_user_game });
+			let countTab = result.filter(count => {
+				return player.id_user_game == count.id_user_game;
+			});
 			console.log(countTab);
-			return {id_user_game : player.id_user_game , user_name : player.user_name, countCard : countTab[0].countCard }
+			return {
+				id_user_game: player.id_user_game,
+				user_name: player.user_name,
+				countCard: countTab[0].countCard
+			};
 		});
 
 		this.setState({
-			allPlayersCountCards : allPlayersCountCards,
-			othersPlayersCountCards : othersPlayersCountCards
-		})
+			allPlayersCountCards: allPlayersCountCards,
+			othersPlayersCountCards: othersPlayersCountCards
+		});
 
 		//console.log(allPlayersCountCards);
 		//console.log(othersPlayersCountCards);
-
 	};
 
 	renderMyHand = () => {
@@ -341,6 +354,10 @@ export default class Game extends React.Component {
 				</div>
 			);
 		});
+	};
+
+	setDustBin = value => {
+		this.setState({ dustBin: [...this.state.dustBin, value] });
 	};
 
 	render() {
@@ -388,36 +405,32 @@ export default class Game extends React.Component {
 					)}
 				</div>
 				<div className="d-flex my-5">
-				{this.state.othersPlayersCountCards.map(card => {
-					return (
-						<>
-						<div className="container-deck">
-						<SvgFactory iconname="deck" />
+					{this.state.othersPlayersCountCards.map(card => {
+						return (
+							<div key={card.id_user_game} className="container-deck">
+								<SvgFactory iconname="deck" />
 
-						<div className="count-deck">{card.countCard}</div>
-						<div className="username">{card.user_name.toLowerCase()}</div>
-					</div>
-					
-					</>
-					)
-				})}
+								<div className="count-deck">{card.countCard}</div>
+								<div className="username">{card.user_name.toLowerCase()}</div>
+							</div>
+						);
+					})}
 				</div>
 
 				<div className="d-flex justify-content-center align-items-center mb-5">
-					<div style={{ width: "20%", opacity: "0.2" }} className="container-circle mx-1">
+					<div
+						style={{ width: "20%", opacity: "0.2", maxWidth: "150px" }}
+						className="container-circle mx-1 mx-md-3"
+					>
 						<SvgFactory iconname="circle" />
 
-						<div className="numero count-last">2</div>
+						<div className="numero count-last">{this.state.dustBin.length >= 2 ? this.state.dustBin[this.state.dustBin.length - 2] : "/"}</div>
 					</div>
-					<div style={{ width: "60%" }} className="container-circle mx-2">
-						<SvgFactory iconname="circle" />
-
-						{/* <div className="numero count-main">2</div> */}
-						<div className="numero">
-							<img src={require("../runner_start.svg")} width="100%" />
-						</div>
-					</div>
-					<div style={{ width: "20%" }} className="container-circle mustard mx-1">
+					<DustBin lastValue={this.state.dustBin.slice(-1)} />
+					<div
+						style={{ width: "20%", maxWidth: "150px" }}
+						className="container-circle mustard mx-1 mx-md-3"
+					>
 						<SvgFactory iconname="circle" />
 
 						<div className="numero">
@@ -427,17 +440,7 @@ export default class Game extends React.Component {
 				</div>
 				<div className="d-flex justify-content-center align-items-center">
 					{this.state.myDeck.map((e, idx) => {
-						return (
-							<div
-								key={idx}
-								style={{ width: "90px" }}
-								className="container-card mx-1"
-							>
-								<SvgFactory iconname="card" />
-
-								<div className="numero count-last">{e}</div>
-							</div>
-						);
+						return <Card key={idx} cardValue={e} setDustBin={this.setDustBin} />;
 					})}
 				</div>
 			</div>

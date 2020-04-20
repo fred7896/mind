@@ -1,14 +1,14 @@
 @import "../../variables.scss";
 
 input {
-    font-size:24px;
+    font-size:1.3em;
     text-transform: uppercase;
     text-align: center;
     font-weight: bold;
 }
 
 .codeFont {
-    font-size:24px;
+    font-size:1.3em;
     text-transform: uppercase;
     text-align: center;
     font-weight: bold;
@@ -33,21 +33,21 @@ input {
 
 .imperialButton {
     background-color: $imperialBlue;
-    font-size: 24px;
+    font-size: 1.3em;
     font-weight: bold;
     
 }
 
 .salsaButton {
     background-color: $redSalsa;
-    font-size: 24px;
+    font-size: 1.3em;
     font-weight: bold;  
 }
 
 .mustardButton {
     color:$richBlack;
     background-color: $lightCyan;
-    font-size: 24px;
+    font-size: 1.3em;
     font-weight: bold
 }
 
