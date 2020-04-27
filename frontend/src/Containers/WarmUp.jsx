@@ -6,7 +6,7 @@ import "../global.scss";
 export default class WarmUp extends React.Component {
 
 	state = {
-		players : []
+		players: []
 	}
 
 	componentDidMount() {
@@ -16,20 +16,37 @@ export default class WarmUp extends React.Component {
 	getPlayers = () => {
 		axios.get(`http://localhost:4001/api/usergame/game/${this.props.match.params.gameId}`).then(res => {
 			this.setState({
-				players : res.data
+				players: res.data
 			})
 		})
 	}
 	updateGameStatus = () => {
-		let data = {
-			game_status: 1
-		};
 		axios
-			.put(`http://localhost:4001/api/game/${this.props.match.params.gameId}`, data)
+			.get(`http://localhost:4001/api/game/all/${this.props.match.params.gameId}`)
 			.then(res => {
-				console.log(res);
-				this.props.history.push(`/game/main/${this.props.match.params.gameId}`);
+				if (res.data.length > 0) {
+					if (res.data[0].game_status == 0) {
+						let data = {
+							game_status: 1
+						};
+						axios
+							.put(`http://localhost:4001/api/game/${this.props.match.params.gameId}`, data)
+							.then(res => {
+								console.log(res);
+								this.props.history.push(`/game/main/${this.props.match.params.gameId}`);
+							});
+
+					}
+					if (res.data[0].game_status > 0) {
+						this.props.history.push(`/game/main/${this.props.match.params.gameId}`);
+					}
+				}
+			})
+			.catch(error => {
+				console.log(error);
 			});
+
+
 	};
 
 	render() {

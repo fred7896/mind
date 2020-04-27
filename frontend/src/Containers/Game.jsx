@@ -11,8 +11,9 @@ export default class Game extends React.Component {
 	state = {
 		life: 1,
 		shuriken: 1,
-		turn: 1,
+		turn: 0,
 		gameInfos: [],
+		game_status: null,
 		move: 0,
 		cardgame: [],
 		cardstate: [],
@@ -28,28 +29,53 @@ export default class Game extends React.Component {
 	componentDidMount() {
 		this.getGameInfos();
 		this.getUser();
-		if (this.state.move === 0) {
-			this.initLife();
-			this.setCardGame();
-		}
+		this.getPlayers();
+		this.gameManager();
 		if (this.state.cardgame.length > 0) {
 			this.setCardState();
 		}
-		if (this.state.players.length > 0) {
-			this.renderMyHand();
+		if (this.state.players.length > 0 && this.state.game_status > 1) {
+			this.getCards();
+			if (this.state.cardstate.length > 0 && this.state.turn > 0) {
+				this.renderMyHand();
+				this.renderTeammatesDeck();
+				this.renderBin();
+			}
 		}
-		this.getCountCardHand();
+		if (this.state.game_status > 1) {
+			this.getCountCardHand();
+		}
+
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		if (prevState.cardstate !== this.state.cardstate) {
-			this.getCountCardHand();
-			this.renderMyHand();
-			this.renderTeammatesDeck();
-		}
 		if (prevState.players !== this.state.players && this.state.players.length > 0) {
-			this.renderMyHand();
-			this.renderTeammatesDeck();
+			this.getCards();
+			if (this.state.cardstate.length > 0 && this.state.turn > 0) {
+				this.renderMyHand();
+				this.renderTeammatesDeck();
+			}
+		}
+		if (prevState.cardstate !== this.state.cardstate && this.state.cardstate.length > 0) {
+			this.getCountCardHand();
+			if (this.state.turn > 0) {
+				this.renderMyHand();
+				this.renderBin();
+				this.renderTeammatesDeck();
+			}
+		}
+		if (prevState.game_status !== this.state.game_status) {
+			this.gameManager();
+		}
+
+	}
+
+	gameManager = () => {
+		if (this.state.game_status == null) {
+			this.getGameInfos();
+		}
+		if (this.state.game_status == 1) {
+			this.initGame();
 		}
 	}
 
@@ -94,6 +120,7 @@ export default class Game extends React.Component {
 				if (res.data.length > 0) {
 					this.setState({
 						gameInfos: res.data,
+						game_status: res.data[0].game_status,
 						life: res.data[0].life,
 						shuriken: res.data[0].shuriken,
 						turn: res.data[0].turn,
@@ -106,11 +133,27 @@ export default class Game extends React.Component {
 			});
 	};
 
+	initGame = () => {
+		console.log("init game ...");
+		this.initLife();
+		this.setCardGame();
+		this.createLibrary();
+		if (this.state.cardstate.length > 0) {
+			this.finishStepOne();
+		} else {
+			this.setCardState();
+		}
+
+	}
+
 	initLife = () => {
 		axios
 			.get(`http://localhost:4001/api/usergame/game/${this.props.match.params.gameId}`)
 			.then(res => {
 				if (res.data.length > 0) {
+					this.setState({
+						players: res.data
+					});
 					let data = {
 						life: res.data.length
 					};
@@ -120,24 +163,21 @@ export default class Game extends React.Component {
 							data
 						)
 						.then(res => {
-							console.log("getplayers");
-							this.getGameInfos();
-							this.getPlayers();
+							console.log("lives calculated...");
 						});
 				}
 			})
 			.catch(error => {
 				console.log(error);
 			});
-
-		console.log("init game ...");
 	};
 
 	setCardGame = () => {
+		console.log("create cards...");
 		axios
 			.get(`http://localhost:4001/api/cardgame/game/${this.props.match.params.gameId}`)
 			.then(res => {
-				if (res.data.length === 0) {
+				if (res.data.length === 0 && this.state.game_status <= 1) {
 					axios.get(`http://localhost:4001/api/card/all`).then(res => {
 						if (res.data.length > 0) {
 							console.log(res.data);
@@ -156,20 +196,11 @@ export default class Game extends React.Component {
 										}
 									)
 									.then(res => {
-										console.log("create library...");
-										axios
-											.get(
-												`http://localhost:4001/api/cardgame/game/${this.props.match.params.gameId}`
-											)
-											.then(res => {
-												console.log(res.data);
-												this.setState(
-													{ cardgame: res.data },
-													this.setCardState()
-												);
-											});
+										console.log(res);
+										console.log("create card...");
 									});
 							}
+
 						}
 					});
 				} else {
@@ -178,13 +209,66 @@ export default class Game extends React.Component {
 			});
 	};
 
+	getCards = () => {
+		console.log("get cards game");
+		axios
+			.get(
+				`http://localhost:4001/api/cardgame/game/${this.props.match.params.gameId}`
+			)
+			.then(res => {
+				console.log(res.data);
+				this.setState(
+					{ cardgame: res.data },
+					this.getCardState()
+				);
+			});
+	}
+
+	getCardState = () => {
+		console.log("get cards state");
+		axios
+			.get(`http://localhost:4001/api/cardstate/game/${this.props.match.params.gameId}`).then(res => {
+				console.log(res);
+				this.setState({
+					cardstate: res.data
+				});
+			})
+	}
+
+	createLibrary = () => {
+		axios
+			.get(
+				`http://localhost:4001/api/cardgame/game/${this.props.match.params.gameId}`
+			)
+			.then(res => {
+				console.log(res.data);
+				this.setState(
+					{ cardgame: res.data },
+					this.setCardState()
+				);
+			});
+	}
+
+	finishStepOne = () => {
+		console.log("finishStepOne...");
+		let data = {
+			game_status: 2
+		};
+		axios
+			.put(`http://localhost:4001/api/game/${this.props.match.params.gameId}`, data)
+			.then(res => {
+				console.log(res);
+			});
+	}
+
 	setCardState = () => {
 		axios
 			.get(`http://localhost:4001/api/cardstate/game/${this.props.match.params.gameId}`)
 			.then(res => {
 				console.log(res.data);
-				if (res.data.length === 0) {
+				if (res.data.length === 0 && this.state.game_status <= 1) {
 					for (let i = 0; i < this.state.cardgame.length; i++) {
+						console.log(this.state.cardgame.length);
 						axios
 							.post(
 								"http://localhost:4001/api/cardstate",
@@ -199,7 +283,12 @@ export default class Game extends React.Component {
 									}
 								}
 							)
-							.then(res => console.log(res));
+							.then(res => console.log(res))
+							.catch(error => {
+								if (error.response.status === 409) {
+									this.finishStepOne();
+								}
+							});
 					}
 				} else {
 					this.setState({
@@ -220,9 +309,19 @@ export default class Game extends React.Component {
 	};
 
 	drawCards = () => {
-		for (let i = 0; i < this.state.turn; i++) {
+		let newTurn = this.state.turn + 1;
+		for (let i = 0; i < newTurn; i++) {
 			this.drawCard();
 		}
+		let data = {
+			turn: newTurn
+		};
+		axios
+			.put(`http://localhost:4001/api/game/${this.props.match.params.gameId}`, data)
+			.then(res => {
+				console.log(res);
+				this.getGameInfos();
+			});
 	};
 
 	drawCard = () => {
@@ -244,7 +343,7 @@ export default class Game extends React.Component {
 				move: this.state.move + 1
 			};
 			axios.put(`http://localhost:4001/api/cardstate/${cardToDraw}`, data).then(res => {
-				this.setCardState();
+				this.getCardState();
 			});
 		}
 	};
@@ -285,89 +384,147 @@ export default class Game extends React.Component {
 
 		console.log(result);
 
-		const allPlayersCountCards = this.state.players.map(player => {
-			console.log(player);
-			let countTab = result.filter(count => {
-				return player.id_user_game == count.id_user_game;
-			});
-			console.log(countTab);
-			return {
-				id_user_game: player.id_user_game,
-				user_name: player.user_name,
-				countCard: countTab[0].countCard
-			};
-		});
+		// const allPlayersCountCards = this.state.players.map(player => {
+		// 	// console.log(player);
+		// let countTab = result.filter(count => {
+		// 	return player.id_user_game == count.id_user_game;
+		// });
+		// 	// console.log(countTab);
+		// 	return {
+		// 		id_user_game: player.id_user_game,
+		// 		user_name: player.user_name,
+		// 		countCard: countTab[0].countCard
+		// 	};
+		// });
 
 		const othersPlayersCountCards = othersPlayers.map(player => {
-			console.log(player);
+			// console.log(player);
 			let countTab = result.filter(count => {
 				return player.id_user_game == count.id_user_game;
 			});
-			console.log(countTab);
-			return {
-				id_user_game: player.id_user_game,
-				user_name: player.user_name,
-				countCard: countTab[0].countCard
-			};
+			if (countTab.length > 0) {
+				return {
+					id_user_game: player.id_user_game,
+					user_name: player.user_name,
+					countCard: countTab[0].countCard
+				};
+			} else {
+				return {
+					id_user_game: player.id_user_game,
+					user_name: player.user_name,
+					countCard: 0
+				};
+			}
+			// console.log(countTab);
+
 		});
 
 		this.setState({
-			allPlayersCountCards: allPlayersCountCards,
+			//allPlayersCountCards: allPlayersCountCards,
 			othersPlayersCountCards: othersPlayersCountCards
 		});
 
-		//console.log(allPlayersCountCards);
-		//console.log(othersPlayersCountCards);
 	};
 
 	renderMyHand = () => {
+		console.log("render my hand...");
 		let gameUser = this.state.players.filter(e => {
 			return e.id_user == this.state.userId;
 		});
-		console.log(gameUser);
+		// console.log(gameUser);
 		if (gameUser.length > 0) {
 			const cardInMyHand = this.state.cardstate.filter(e => {
 				return e.id_slot == 2 && e.id_game_user == gameUser[0].id_user_game;
 			});
-			console.log(cardInMyHand);
+			console.log(Array.isArray(cardInMyHand));
+			let myDeck = [];
 			for (let i = 0; i < cardInMyHand.length; i++) {
-				let value = cardInMyHand[i].id_card_game;
-				axios.get(`http://localhost:4001/api/cardgame/value/${value}`).then(res => {
-					console.log(res.data[0].id_card);
-					if (!this.state.myDeck.includes(res.data[0].id_card)) {
-						this.setState({
-							myDeck: [...this.state.myDeck, res.data[0].id_card]
-						});
-					}
+				let idCardGame = cardInMyHand[i].id_card_game;
+				let superCard = cardInMyHand[i].id_card_state;
+				//console.log(superCard);
+				axios.get(`http://localhost:4001/api/cardgame/value/${idCardGame}`).then(res => {
+					//console.log(res.data[0]);
+					let result = {};
+					result = { "idCardState": superCard, "value": res.data[0].id_card };
+
+					//myDeck.push(result);
+					this.setState({
+						myDeck: [...this.state.myDeck, result]
+					});
+
 				});
 			}
+
 		}
 	};
 
-	displayMyDeck = () => {
-		this.state.myDeck.map(e => {
-			return (
-				<div style={{ width: "90px" }} className="container-card mx-1">
-					<SvgFactory iconname="card" />
+	removeDuplicate = (arr) => {
+		const filteredArr = arr.reduce((acc, current) => {
+			const x = acc.find(item => item.idCardState === current.idCardState);
+			if (!x) {
+				return acc.concat([current]);
+			} else {
+				return acc;
+			}
+		}, []);
 
-					<div className="numero count-last">{e}</div>
-				</div>
-			);
+		return filteredArr;
+	};
+
+
+	renderBin = () => {
+		this.setState({
+			dustBin: []
 		});
-	};
+		let dustBin = this.state.cardstate.filter(card => {
+			return card.id_slot === 3
+		});
+		//console.log(dustBin);
+		for (let i = 0; i < dustBin.length; i++) {
+			let value = dustBin[i].id_card_game;
+			console.log(value);
+			axios.get(`http://localhost:4001/api/cardgame/value/${value}`).then(res => {
+				console.log(res.data[0].id_card);
+				console.log(dustBin[i].id_card_state);
+				this.setState({
+					dustBin: [...this.state.dustBin, { "idCardState": dustBin[i].id_card_state, "value": res.data[0].id_card }]
+				});
+			});
 
-	setDustBin = value => {
-		this.setState({ dustBin: [...this.state.dustBin, value] });
-	};
+		}
+
+	}
+
+	fromHandToBin = idCardState => {
+		// this.setState({
+		// 	myDeck: []
+		// });
+		let gameUser = this.state.players.filter(e => {
+			return e.id_user == this.state.userId;
+		});
+		let data = {
+			id_slot: 3,
+			id_game_user: gameUser.id_user_game,
+			move: this.state.move + 1
+		};
+		axios.put(`http://localhost:4001/api/cardstate/${idCardState}`, data).then(res => {
+			this.getCardState();
+		});
+	}
 
 	render() {
-		// console.log(this.state.gameInfos);
+		//console.log(this.state.gameInfos);
 		// console.log(this.state.cardgame);
 		console.log(this.state.cardstate);
 		// console.log(this.state.cardsInPlayersHands);
 		// console.log(this.state.userId);
-		console.log(this.state.players);
-		// console.log(this.state.myDeck);
+		//console.log(this.state.players);
+		console.log(this.state.myDeck.length);
+		console.log(this.state.myDeck);
+		// console.log(this.state.dustBin);
+		// console.log(this.state.game_status);
+		let decky = this.removeDuplicate(this.state.myDeck);
+		console.log(decky);
 		return (
 			<div className="container fontCyan boldLife game">
 				<div className="d-flex my-3">
@@ -405,7 +562,7 @@ export default class Game extends React.Component {
 					)}
 				</div>
 				<div className="d-flex my-5">
-					{this.state.othersPlayersCountCards.map(card => {
+					{this.state.othersPlayersCountCards && this.state.othersPlayersCountCards.map(card => {
 						return (
 							<div key={card.id_user_game} className="container-deck">
 								<SvgFactory iconname="deck" />
@@ -424,7 +581,7 @@ export default class Game extends React.Component {
 					>
 						<SvgFactory iconname="circle" />
 
-						<div className="numero count-last">{this.state.dustBin.length >= 2 ? this.state.dustBin[this.state.dustBin.length - 2] : "/"}</div>
+						<div className="numero count-last">{this.state.dustBin.length >= 2 ? this.state.dustBin[this.state.dustBin.length - 2].value : "/"}</div>
 					</div>
 					<DustBin lastValue={this.state.dustBin.slice(-1)} />
 					<div
@@ -439,8 +596,8 @@ export default class Game extends React.Component {
 					</div>
 				</div>
 				<div className="d-flex justify-content-center align-items-center">
-					{this.state.myDeck.map((e, idx) => {
-						return <Card key={idx} cardValue={e} setDustBin={this.setDustBin} />;
+					{decky.map((e, idx) => {
+						return <Card key={idx} cardValue={e.value} idCardState={e.idCardState} fromHandToBin={this.fromHandToBin} />;
 					})}
 				</div>
 			</div>

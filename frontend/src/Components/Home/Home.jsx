@@ -165,7 +165,7 @@ export default class Home extends React.Component {
 			.get(`http://localhost:4001/api/usergame/game/${this.state.joinedGame[0].id_game}`)
 			.then(res => {
 				console.log(res.data);
-				if (res.data.length === 0) {
+				if (res.data.length !== 0) {
 					axios
 						.post(
 							"http://localhost:4001/api/usergame",
@@ -180,7 +180,6 @@ export default class Home extends React.Component {
 							}
 						)
 						.then(response => {
-							console.log(this.props.history);
 							this.props.history.push(
 								`/game/lobby/${this.state.joinedGame[0].id_game}`
 							);

@@ -173,7 +173,20 @@ app.get("/api/game/creator/:id", (req, res) => {
 	});
 });
 
-// UPDATE STATUS GAME
+//GET STATUS GAME BY GAME ID
+app.get("/api/status/game/:id", (req, res) => {
+	const id_game = req.params.id;
+	db.query("SELECT game_status FROM game WHERE id_game = ?", [id_game], (err, results) => {
+		if (err) {
+			res.status(500).send("Erreur lors de la récupération du statut de la game");
+		} else {
+			res.json(results);
+		}
+	});
+
+})
+
+// UPDATE GAME
 app.put("/api/game/:id", (req, res) => {
 	const gameId = req.params.id;
 	const formData = req.body;
@@ -187,6 +200,7 @@ app.put("/api/game/:id", (req, res) => {
 		}
 	});
 });
+
 
 // GET GAME INFOS BY GAME ID
 app.get("/api/game/all/:id", (req, res) => {
@@ -269,7 +283,13 @@ app.post("/api/cardstate", (req, res) => {
 	db.query("INSERT INTO card_state SET ?", cardstate, (err, results) => {
 		if (err) {
 			console.error("Failure! " + err);
-			return res.status(500).send("requete de création invalide");
+			let errorCode = err.code;
+			if (errorCode.includes("ER_DUP_ENTRY")) {
+				return res.status(409).send("cardstate already created");
+			} else {
+				return res.status(500).send("requete de création invalide");
+			}
+			
 		} else {
 			console.log("The solution is: ", results);
 			res.send({

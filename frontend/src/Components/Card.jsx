@@ -6,6 +6,7 @@ import SvgFactory from "../Components/SvgFactory/SvgFactory";
 const Card = props => {
 	const style = { width: "90px" };
 	const opacity = props.isDragging ? 0.4 : 1;
+	console.log(props.cardValue);
 	return (
 		<div
 			ref={props.connectDragSource}
@@ -23,13 +24,13 @@ export default DragSource(
 	"card",
 	{
 		beginDrag: props => {
-			return { name: props.cardValue };
+			return { name: props.cardValue, id : props.idCardState };
         },
         endDrag(props, monitor) {
             const item = monitor.getItem()
             const dropResult = monitor.getDropResult()
             if (dropResult) {
-                props.setDustBin(item.name);
+				props.fromHandToBin(item.id);
             }
           },
 	},

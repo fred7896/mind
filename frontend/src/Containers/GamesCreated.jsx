@@ -33,6 +33,7 @@ export default class GamesCreated extends React.Component {
 					</Link>
 				);
 			case 1:
+			case 2:
 				return (
 					<Link
 						to={`/game/lobby/${id}`}
@@ -48,7 +49,7 @@ export default class GamesCreated extends React.Component {
 						</div>
 					</Link>
 				);
-			case 2:
+			case 3:
 				return (
 					<div
 						className="imperialButton d-flex align-items-center"
