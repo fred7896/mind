@@ -161,42 +161,50 @@ export default class Home extends React.Component {
 
 	checkGame = () => {
 		console.log(this.state.joinedGame);
-		axios
-			.get(`http://localhost:4001/api/usergame/game/${this.state.joinedGame[0].id_game}`)
-			.then(res => {
-				console.log(res.data);
-				if (res.data.length !== 0) {
-					axios
-						.post(
-							"http://localhost:4001/api/usergame",
-							{
-								id_game_fk: this.state.joinedGame[0].id_game,
-								id_user: this.state.userId
-							},
-							{
-								headers: {
-									Accept: "application/json"
+		if (this.state.joinedGame[0].game_status > 1) {
+			Swal.fire("Erreur", "Game already started", "error");
+		} else {
+			axios
+				.get(`http://localhost:4001/api/usergame/game/${this.state.joinedGame[0].id_game}`)
+				.then(res => {
+					console.log(res.data);
+					if (res.data.length === 0) {
+						Swal.fire("Erreur", "Game created but not validated by creator", "error");
+					}
+					if (res.data.length > 0) {
+						axios
+							.post(
+								"http://localhost:4001/api/usergame",
+								{
+									id_game_fk: this.state.joinedGame[0].id_game,
+									id_user: this.state.userId
+								},
+								{
+									headers: {
+										Accept: "application/json"
+									}
 								}
-							}
-						)
-						.then(response => {
-							this.props.history.push(
-								`/game/lobby/${this.state.joinedGame[0].id_game}`
-							);
-						})
-						.catch(error => {
-							Swal.fire("Erreur", "Fail join game", "error");
-						});
-				}
-			})
-			.catch(error => {
-				console.error();
-			});
+							)
+							.then(response => {
+								this.props.history.push(
+									`/game/lobby/${this.state.joinedGame[0].id_game}`
+								);
+							})
+							.catch(error => {
+								Swal.fire("Erreur", "Fail join game", "error");
+							});
+					}
+				})
+				.catch(error => {
+					console.error();
+				});
+		}
+
 	};
 
 	render() {
-		console.log(this.state.userId);
-		console.log(this.state.joinCode);
+		//console.log(this.state.userId);
+		//console.log(this.state.joinCode);
 		return (
 			<div className="container fontCyan">
 				<div className="d-flex justify-content-center align-items-center mindBox">
@@ -223,42 +231,42 @@ export default class Home extends React.Component {
 							</div>
 						</>
 					) : (
-						<>
-							<input
-								type="text"
-								name="insertCode"
-								placeholder="code"
-								className="cyanAndTransparent nameInput my-2"
-								value={this.state.insertCode}
-								onChange={this.handleInputChange}
-							/>
+							<>
+								<input
+									type="text"
+									name="insertCode"
+									placeholder="code"
+									className="cyanAndTransparent nameInput my-2"
+									value={this.state.insertCode}
+									onChange={this.handleInputChange}
+								/>
 
-							<div
-								className="nameInput inputBox salsaButton my-2"
-								onClick={this.joinGame}
-							>
-								JOIN GAME
+								<div
+									className="nameInput inputBox salsaButton my-2"
+									onClick={this.joinGame}
+								>
+									JOIN GAME
 							</div>
-							<div
-								className="nameInput inputBox imperialButton my-2"
-								onClick={this.createGame}
-							>
-								CREATE GAME
+								<div
+									className="nameInput inputBox imperialButton my-2"
+									onClick={this.createGame}
+								>
+									CREATE GAME
 							</div>
-							{/* {this.state.joinCode && this.state.joinCode.length > 0 && (
+								{/* {this.state.joinCode && this.state.joinCode.length > 0 && (
 								<div className="my-4 codeFont">{this.state.joinCode}</div>
 							)} */}
-							<Link
-								to={`/games/user/${this.state.userId}`}
-								className="link-unstyled"
-								style={{ width: "100%" }}
-							>
-								<div className="nameInput inputBox imperialButton my-2">
-									CURRENT GAMES
+								<Link
+									to={`/games/user/${this.state.userId}`}
+									className="link-unstyled"
+									style={{ width: "100%" }}
+								>
+									<div className="nameInput inputBox imperialButton my-2">
+										CURRENT GAMES
 								</div>
-							</Link>
-						</>
-					)}
+								</Link>
+							</>
+						)}
 				</form>
 			</div>
 		);

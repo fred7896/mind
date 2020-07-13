@@ -7,6 +7,13 @@ import SvgFactory from "../Components/SvgFactory/SvgFactory";
 import Card from "../Components/Card";
 import DustBin from "../Components/DustBin";
 
+/*
+* game_status
+* 0 : la partie vient juste d'être créée. le createur doit valider la partie avant de partager le code.
+* 1 : le créateur vient de cliquer sur Go pour lancer la partie
+* 2 :  
+*/
+
 export default class Game extends React.Component {
 	state = {
 		life: 1,
@@ -28,9 +35,12 @@ export default class Game extends React.Component {
 
 	componentDidMount() {
 		this.getGameInfos();
-		this.getUser();
-		this.getPlayers();
-		this.gameManager();
+		if (this.state.userId === "") {
+			this.getUser();
+		}
+		if (this.state.players.length === 0) {
+			this.getPlayers();
+		}
 		if (this.state.cardgame.length > 0) {
 			this.setCardState();
 		}
@@ -65,18 +75,32 @@ export default class Game extends React.Component {
 			}
 		}
 		if (prevState.game_status !== this.state.game_status) {
-			this.gameManager();
+			this.getGameInfos();
+		}
+		if (prevState.turn !== this.state.turn) {
+			this.getGameInfos();
+		}
+	}
+
+	initGame = () => {
+		console.log("init game ...");
+		this.getLife();
+		this.setCardGame();
+		this.createLibrary();
+		if (this.state.cardstate.length > 0) {
+			this.finishStepOne();
+		} else {
+			this.setCardState();
 		}
 
 	}
 
-	gameManager = () => {
-		if (this.state.game_status == null) {
-			this.getGameInfos();
-		}
-		if (this.state.game_status == 1) {
-			this.initGame();
-		}
+	handleStart = () => {
+		this.initGame();
+	}
+
+	updateGame = () => {
+
 	}
 
 	getUser = () => {
@@ -133,20 +157,10 @@ export default class Game extends React.Component {
 			});
 	};
 
-	initGame = () => {
-		console.log("init game ...");
-		this.initLife();
-		this.setCardGame();
-		this.createLibrary();
-		if (this.state.cardstate.length > 0) {
-			this.finishStepOne();
-		} else {
-			this.setCardState();
-		}
 
-	}
 
-	initLife = () => {
+
+	getLife = () => {
 		axios
 			.get(`http://localhost:4001/api/usergame/game/${this.props.match.params.gameId}`)
 			.then(res => {
@@ -236,6 +250,7 @@ export default class Game extends React.Component {
 	}
 
 	createLibrary = () => {
+		console.log("Create library...")
 		axios
 			.get(
 				`http://localhost:4001/api/cardgame/game/${this.props.match.params.gameId}`
@@ -262,6 +277,7 @@ export default class Game extends React.Component {
 	}
 
 	setCardState = () => {
+		console.log("Set card state...");
 		axios
 			.get(`http://localhost:4001/api/cardstate/game/${this.props.match.params.gameId}`)
 			.then(res => {
@@ -274,8 +290,7 @@ export default class Game extends React.Component {
 								"http://localhost:4001/api/cardstate",
 								{
 									id_card_game: this.state.cardgame[i].id_card_game,
-									id_slot: 1,
-									move: this.state.move + 1
+									id_slot: 1
 								},
 								{
 									headers: {
@@ -437,17 +452,12 @@ export default class Game extends React.Component {
 				return e.id_slot == 2 && e.id_game_user == gameUser[0].id_user_game;
 			});
 			console.log(Array.isArray(cardInMyHand));
-			let myDeck = [];
 			for (let i = 0; i < cardInMyHand.length; i++) {
 				let idCardGame = cardInMyHand[i].id_card_game;
 				let superCard = cardInMyHand[i].id_card_state;
-				//console.log(superCard);
 				axios.get(`http://localhost:4001/api/cardgame/value/${idCardGame}`).then(res => {
-					//console.log(res.data[0]);
 					let result = {};
 					result = { "idCardState": superCard, "value": res.data[0].id_card };
-
-					//myDeck.push(result);
 					this.setState({
 						myDeck: [...this.state.myDeck, result]
 					});
@@ -513,6 +523,7 @@ export default class Game extends React.Component {
 	}
 
 	render() {
+		console.log(this.state.turn);
 		//console.log(this.state.gameInfos);
 		// console.log(this.state.cardgame);
 		console.log(this.state.cardstate);
@@ -522,7 +533,7 @@ export default class Game extends React.Component {
 		console.log(this.state.myDeck.length);
 		console.log(this.state.myDeck);
 		// console.log(this.state.dustBin);
-		// console.log(this.state.game_status);
+		console.log(this.state.game_status);
 		let decky = this.removeDuplicate(this.state.myDeck);
 		console.log(decky);
 		return (
@@ -583,7 +594,7 @@ export default class Game extends React.Component {
 
 						<div className="numero count-last">{this.state.dustBin.length >= 2 ? this.state.dustBin[this.state.dustBin.length - 2].value : "/"}</div>
 					</div>
-					<DustBin lastValue={this.state.dustBin.slice(-1)} />
+					<DustBin lastValue={this.state.dustBin.slice(-1)} handleStart={this.handleStart} turn={this.state.turn} gameStatus={this.state.game_status}/>
 					<div
 						style={{ width: "20%", maxWidth: "150px" }}
 						className="container-circle mustard mx-1 mx-md-3"

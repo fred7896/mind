@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import routes from "./Routes";
 import "./global.scss";
 import { DndProvider } from "react-dnd";
-import Backend from "react-dnd-html5-backend";
+//import Backend from "react-dnd-html5-backend";
 import TouchBackend from "react-dnd-touch-backend";
 
 const opts = {

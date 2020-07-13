@@ -28,7 +28,7 @@ export default class GamesCreated extends React.Component {
 							className="imperialButton d-flex align-items-center"
 							style={{ height: "100%" }}
 						>
-							Start Game
+							Validate creation
 						</div>
 					</Link>
 				);

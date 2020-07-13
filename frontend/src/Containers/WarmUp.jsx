@@ -25,7 +25,8 @@ export default class WarmUp extends React.Component {
 			.get(`http://localhost:4001/api/game/all/${this.props.match.params.gameId}`)
 			.then(res => {
 				if (res.data.length > 0) {
-					if (res.data[0].game_status == 0) {
+					console.log(typeof res.data[0].game_status)
+					if (res.data[0].game_status === 0) {
 						let data = {
 							game_status: 1
 						};
